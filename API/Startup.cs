@@ -1,3 +1,4 @@
+using System.Net.Security;
 using System.Net.Mime;
 using System;
 using System.Collections.Generic;
@@ -32,9 +33,15 @@ namespace API
         {
 
             services.AddControllers();
+            services.AddCors(opt => {
+                opt.AddPolicy("CorsPolicy", policy => {
+                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+                });
+            });
             services.AddDbContext<DataContext>(opt => {
                 opt.UseSqlite(_config.GetConnectionString("DefaultConnection"));
             });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
@@ -52,6 +59,8 @@ namespace API
             }
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
 
             app.UseAuthorization();
 
