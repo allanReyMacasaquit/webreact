@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Domain;
+using MediatR;
+using Application.Activities;
 using Persistence;
 
 namespace API.Controllers
@@ -14,95 +16,50 @@ namespace API.Controllers
     [ApiController]
     public class ActivitiesController : BaseApiController
     {
-        private readonly DataContext _context;
+        private readonly IMediator _mediator;
 
-        public ActivitiesController(DataContext context)
+        public ActivitiesController(IMediator mediator)
         {
-            _context = context;
+            _mediator = mediator;
+
         }
 
         // GET: api/Activities
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Activity>>> GetActivities()
         {
-            return await _context.Activities.ToListAsync();
+            return await Mediator.Send(new List.Query());
         }
 
         // GET: api/Activities/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Activity>> GetActivity(Guid id)
         {
-            var activity = await _context.Activities.FindAsync(id);
-
-            if (activity == null)
-            {
-                return NotFound();
-            }
-
-            return activity;
+            return await Mediator.Send(new Details.Query{Id = id});
         }
 
-        // PUT: api/Activities/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // // PUT: api/Activities/5
+        // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutActivity(Guid id, Activity activity)
+        public async Task<IActionResult> EditActivity(Guid id, Activity activity)
         {
-            if (id != activity.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(activity).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ActivityExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+           activity.Id = id;
+           return Ok(await Mediator.Send(new Edit.Command {Activity = activity}));
         }
 
         // POST: api/Activities
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Activity>> PostActivity(Activity activity)
+        public async Task<IActionResult> CreateActivity(Activity activity)
         {
-            _context.Activities.Add(activity);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetActivity", new { id = activity.Id }, activity);
+          return Ok(await Mediator.Send(new Create.Command {Activity = activity}));
         }
 
-        // DELETE: api/Activities/5
+        // // DELETE: api/Activities/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id)
         {
-            var activity = await _context.Activities.FindAsync(id);
-            if (activity == null)
-            {
-                return NotFound();
-            }
-
-            _context.Activities.Remove(activity);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ActivityExists(Guid id)
-        {
-            return _context.Activities.Any(e => e.Id == id);
+           return Ok(await Mediator.Send(new Delete.Command{Id = id}));
         }
     }
 }
