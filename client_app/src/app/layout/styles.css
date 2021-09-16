@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #eaeaea !important;
+}
+
+.ui.inverted.menu {
+  background-image: linear-gradient(
+    135deg,
+    rgb(76, 9, 139) 0%,
+    rgb(163, 15, 231) 69%,
+    rgb(130, 16, 223) 89%
+  ) !important;
+}
+
+.ui.segment {
+  background-color: #eaeaea;
+}
+.ui.fluid.raised.card {
+  background-color: wheat;
+}
