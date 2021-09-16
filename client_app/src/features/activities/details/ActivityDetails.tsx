@@ -16,6 +16,7 @@ function ActivityDetails({
     openForm,
 
 }: Props) {
+
     return (
         <>
      

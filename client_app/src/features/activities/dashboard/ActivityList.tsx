@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { SyntheticEvent, useState } from 'react'
 import { Button, ButtonGroup, Card, CardDescription, Feed, Icon, Item, ItemContent, ItemDescription, ItemExtra, ItemGroup, ItemHeader, ItemMeta, Segment } from 'semantic-ui-react'
 import { Activity } from '../../../app/models/activity'
 
@@ -7,6 +7,8 @@ interface Props {
     selectActivity: (id: string) => void
 
     deleteActivity: (id: string) => void
+
+    submitting: boolean;
 }
 
 function ActivityList({
@@ -15,7 +17,17 @@ function ActivityList({
     selectActivity,
 
     deleteActivity,
+
+    submitting,
 }: Props) {
+
+    const [target, setTarget] = useState('')
+
+    function handleActivityDelete(e: SyntheticEvent<HTMLButtonElement>, id: string) {
+        setTarget(e.currentTarget.name);
+        deleteActivity(id)
+    }
+
     return (
         <>
            <Segment>
@@ -45,9 +57,10 @@ function ActivityList({
                                                     </Feed.Like>
                                                 </Feed.Meta>
                                                 </Feed.Content>
-                                                
                                             </Feed.Event>
                                         </Feed>
+
+                                        <hr style={{color: 'black', width: '10rem', marginTop: '0px'}}/>
                                        <div style={{paddingLeft: 'auto'}}>
                                            <ItemHeader as='a'>{activity.title}</ItemHeader>
                                             <ItemMeta>{activity.date}</ItemMeta>
@@ -61,8 +74,14 @@ function ActivityList({
                                        
                                        <ItemExtra style={{paddingRight: '10px'}}>
                                            <ButtonGroup widths='2'>
-                                               <Button  onClick={() => selectActivity(activity.id)} content='View' color='blue'></Button>
-                                               <Button onClick={() => deleteActivity(activity.id)} content='Delete' color='orange'></Button>
+                                               <Button onClick={() => selectActivity(activity.id)} content='View' color='blue'></Button>
+                                               <Button 
+                                                    name={activity.id}
+                                                    loading={submitting && target === activity.id}  
+                                                    onClick={(e) => handleActivityDelete(e, activity.id)} 
+                                                    content='Delete' 
+                                                    color='orange'>
+                                               </Button>
                                            </ButtonGroup>
                                        </ItemExtra>
                                        </Card>

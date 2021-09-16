@@ -7,6 +7,7 @@ interface Props {
     activity: Activity | undefined;
     closeForm: () => void;
     createOrEdit: (activity: Activity) => void
+    submitting: boolean;
 
 }
 
@@ -15,6 +16,8 @@ function ActivityForm({
     closeForm,
 
     createOrEdit,
+
+    submitting,
 
 }: Props) {  
 
@@ -61,7 +64,7 @@ function ActivityForm({
                     <Form.Input placeholder='eg. Worship' value={activity.category} name='category' onChange={handleInputChange}/>
                    
                     <LabelDetail content='Date' />
-                    <Form.Input placeholder='Date' value={activity.date} name='date' onChange={handleInputChange}/>
+                    <Form.Input type ='date' placeholder='Date' value={activity.date} name='date' onChange={handleInputChange}/>
 
                     <LabelDetail content='City' />
                     <Form.Input placeholder='eg. toronto' value={activity.city} name='city' onChange={handleInputChange}/>
@@ -70,7 +73,7 @@ function ActivityForm({
                     <Form.Input placeholder='eg. 191 address' value={activity.venue} name='venue' onChange={handleInputChange}/>
                     
                     <ButtonGroup widths='2'>
-                        <Button color='purple' type='submit' content='Submit'></Button>
+                        <Button loading={submitting}  color='purple' type='submit' content='Submit'></Button>
                         <Button onClick={closeForm} color='orange' type='button' content='Cancel'></Button>
                     </ButtonGroup>
                     
