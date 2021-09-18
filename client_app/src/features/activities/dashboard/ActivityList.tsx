@@ -1,31 +1,19 @@
+import { observer } from 'mobx-react-lite';
 import React, { SyntheticEvent, useState } from 'react'
-import { Button, ButtonGroup, Card, CardDescription, Feed, Icon, Item, ItemContent, ItemDescription, ItemExtra, ItemGroup, ItemHeader, ItemMeta, Segment } from 'semantic-ui-react'
-import { Activity } from '../../../app/models/activity'
+import { Button, ButtonGroup, Card, CardDescription, Feed,   Icon, Item, ItemContent, ItemDescription, ItemExtra, ItemGroup,  LabelDetail, Segment } from 'semantic-ui-react'
 
-interface Props {
-    activities: Activity[];
-    selectActivity: (id: string) => void
+import { useStore } from '../../../app/stores/Istore';
 
-    deleteActivity: (id: string) => void
 
-    submitting: boolean;
-}
-
-function ActivityList({
-    activities,
-
-    selectActivity,
-
-    deleteActivity,
-
-    submitting,
-}: Props) {
-
+function ActivityList() {
     const [target, setTarget] = useState('')
+    const {activityStore} = useStore();
+    const {activitiesByDate, deleteActivity, loading} = activityStore;
 
     function handleActivityDelete(e: SyntheticEvent<HTMLButtonElement>, id: string) {
         setTarget(e.currentTarget.name);
-        deleteActivity(id)
+        deleteActivity(id);
+       
     }
 
     return (
@@ -33,57 +21,58 @@ function ActivityList({
            <Segment>
                <ItemGroup divided>
                         <div style={{textAlign: 'center',color: 'purple', fontSize: '20px', flex: 'auto'}}>
-                           <h3>{`${activities.length} Lists of Activities`} </h3> 
+                           <h3>{`${activitiesByDate.length} Lists of Activities`} </h3> 
+                           
                         </div>
                 
                     {
-                        activities.map(activity => 
+                        activitiesByDate.map(activity => 
                             (
                                <Item key={activity.id}>
                                    <ItemContent>
+                                      
+                                          
+                                 
                                        <Card fluid  style={{paddingLeft: '10px', backgroundColor: 'wheat'}}>
-                                       <Feed>
-                                            <Feed.Event style={{borderRadius: '50%'}}>
-                                                <Feed.Label style={{width: '10em', height: '7rem', flex: 'auto', marginTop: '10px', marginBottom: '10px', borderRadius: '50%'}} image={`/assets/categoryImages/${activity.category}.jpg`} 
-                                                
-                                                />
+                                        
+                                    
                                                 <Feed.Content>
                                                     <Feed.Summary>
                                                         You added <a href='*'>{activity.title}</a> 
                                                     </Feed.Summary>
                                                     <Feed.Meta>
                                                     <Feed.Like>
-                                                        <Icon name='like' />4 Likes
+                                                        <Icon name='calendar check outline' /> {activity.date}
                                                     </Feed.Like>
                                                 </Feed.Meta>
-                                                </Feed.Content>
-                                            </Feed.Event>
-                                        </Feed>
-
-                                        <hr style={{color: 'black', width: '10rem', marginTop: '0px'}}/>
+                                                <div style={{textAlign: 'center', fontSize: '20px', marginBottom: '5px'}}>{activity.category.toUpperCase()}</div>
+                                        <hr style={{color: 'black', width: '4rem', marginTop: '0px'}}/>
                                        <div style={{paddingLeft: 'auto'}}>
-                                           <ItemHeader as='a'>{activity.title}</ItemHeader>
-                                            <ItemMeta>{activity.date}</ItemMeta>
                                             <ItemDescription style={{color: 'purple'}} >
                                                 <CardDescription >{activity.description}</CardDescription>
                                             </ItemDescription>
+                                            <br/>
+                                        <LabelDetail content='city: ' />
                                             <div>{activity.city} </div>
-                                            <div>{activity.venue}</div>
-                                            <div>{activity.category}</div>
+                                           <br/>
+                                        <LabelDetail content='venue: ' />
+                                            <div>{activity.venue} </div>
+                                    
                                         </div> 
                                        
                                        <ItemExtra style={{paddingRight: '10px'}}>
                                            <ButtonGroup widths='2'>
-                                               <Button onClick={() => selectActivity(activity.id)} content='View' color='blue'></Button>
+                                               <Button onClick={() =>activityStore.selectActivity(activity.id)} content='View' color='blue'></Button>
                                                <Button 
                                                     name={activity.id}
-                                                    loading={submitting && target === activity.id}  
+                                                    loading={ loading && target === activity.id}  
                                                     onClick={(e) => handleActivityDelete(e, activity.id)} 
                                                     content='Delete' 
                                                     color='orange'>
                                                </Button>
                                            </ButtonGroup>
                                        </ItemExtra>
+                                        </Feed.Content>
                                        </Card>
                                    </ItemContent>
                                 </Item> 
@@ -96,4 +85,4 @@ function ActivityList({
     )
 }
 
-export default ActivityList
+export default observer(ActivityList)
