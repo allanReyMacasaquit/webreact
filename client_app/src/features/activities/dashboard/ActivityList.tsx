@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React, { SyntheticEvent, useState } from 'react'
+import { Link} from 'react-router-dom';
 import { Button, ButtonGroup, Card, CardDescription, Feed,   Icon, Item, ItemContent, ItemDescription, ItemExtra, ItemGroup,  LabelDetail, Segment } from 'semantic-ui-react'
 
 import { useStore } from '../../../app/stores/Istore';
@@ -62,7 +63,7 @@ function ActivityList() {
                                        
                                        <ItemExtra style={{paddingRight: '10px'}}>
                                            <ButtonGroup widths='2'>
-                                               <Button onClick={() =>activityStore.selectActivity(activity.id)} content='View' color='blue'></Button>
+                                               <Button as={Link} to={`/activities/${activity.id}`}  content='View' color='blue'></Button>
                                                <Button 
                                                     name={activity.id}
                                                     loading={ loading && target === activity.id}  

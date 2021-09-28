@@ -1,14 +1,19 @@
 import { observer } from 'mobx-react-lite';
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
+import { useHistory, useParams } from 'react-router';
 import { Button, ButtonGroup, Card, Form, Label, LabelDetail, Segment } from 'semantic-ui-react'
+import Loading from '../../../app/layout/components/Loading';
 import { useStore } from '../../../app/stores/Istore';
+import {v4 as uuid} from 'uuid';
+import { Link } from 'react-router-dom';
 
 function ActivityForm() {  
-
+    const history = useHistory();
     const {activityStore} = useStore();
-    const {selectedActivity, closeForm, updateActivity, createActivity, loading} = activityStore;
+    const {updateActivity, createActivity, loading, loadingInitial, loadActivity} = activityStore;
+    const {id} = useParams<{id: string}>();
 
-    const initialState = selectedActivity ?? {
+    const [activity, setActivity] = useState({
         id: '',
         title: '',
         category: '',
@@ -16,14 +21,34 @@ function ActivityForm() {
         date: '',
         city: '',
         venue: '',
-        
-    }
+    });
+    useEffect(() => {
+        if (id) loadActivity(id).then(activity => setActivity(activity!))
+    },[id, loadActivity]);
 
-    const [activity, setActivity] = useState(initialState);
 
+   
     //handle submit form
-    function handleSubmit() {
-        activity.id ? updateActivity(activity) : createActivity(activity)
+    function handleSubmit() 
+    {
+      if (activity.id.length === 0) 
+      {
+          let newActivity = 
+          {
+              ...activity,
+              id: uuid()
+          };
+          createActivity(newActivity).then(() => 
+          {
+              history.push(`/activities/${newActivity.id}`)
+          }) 
+      } else 
+            {
+              updateActivity(activity).then(() => 
+              {
+                  history.push(`/activities/${activity.id}`)
+              })
+            }
     }
 
     //handle input change
@@ -32,7 +57,7 @@ function ActivityForm() {
         setActivity({...activity, [name]: value})
     }
 
-
+    if (loadingInitial) return <Loading content='Loading Activity'/>
     return (
         <>
             <Segment style={{marginTop: '0px'}} clearing color='purple'>
@@ -61,7 +86,7 @@ function ActivityForm() {
                     
                     <ButtonGroup widths='2'>
                         <Button loading={loading}  color='purple' type='submit' content='Submit'></Button>
-                        <Button onClick={closeForm} color='orange' type='button' content='Cancel'></Button>
+                        <Button as={Link} to='/activities' color='orange' type='button' content='Cancel'></Button>
                     </ButtonGroup>
                     
                 </Form>
